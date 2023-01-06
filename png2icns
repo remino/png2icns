@@ -1,0 +1,125 @@
+#!/bin/sh
+# png2icns
+
+VERSION='0.1.0'
+
+png2icns_main() {
+	trap _exit INT TERM
+
+	E_ARGS=16
+	E_NO_FILE=17
+
+	SCRIPT_INV="$( basename "$0" )"
+	SCRIPT_PATH="$( readlink -f "$0" )"
+	SCRIPT_NAME="$( basename "$SCRIPT_PATH" )"
+
+	while getopts hv opt
+	do
+		case $opt in
+			h) cmd=help ;;
+			v) cmd=version ;;
+			*) _invalid_opt ;;
+		esac
+	done
+
+	shift "$(( OPTIND - 1 ))"
+
+	[ -z "$cmd" ] && cmd="process"
+
+	case "$cmd" in
+		help|process|version) "png2icns_$cmd" "$@" ;;
+		*) _invalid_cmd ;;
+	esac
+
+	_exit
+}
+
+png2icns_help() {
+cat <<USAGE
+$SCRIPT_NAME $VERSION
+
+USAGE: $SCRIPT_INV [<options>] <input.png> [<output.icns>]
+
+Convert a single PNG file into a macOS icon file.
+
+If <output.icns> is not specified, the output file will be named
+<basename>.icns, where <basename> is the basename of <input.png>.
+
+OPTIONS:
+
+	-h        Show this help screen.
+	-v        Show script name and version number.
+
+USAGE
+}
+
+png2icns_process() {
+	[ $# -lt 1 ] && png2icns_help && return 0
+
+	input="$1"
+	[ -f "$input" ] || _fatal $E_NO_FILE "No such file: $input"
+	
+	basename="$( basename "$input" .png )"
+
+	output="$2"
+	[ -z "$output" ] && output="$basename.icns"
+
+	_mktmpdir
+	iconset_dir="$LOCAL_TMP_DIR/$basename.iconset"
+	mkdir -p "$iconset_dir"
+	
+	for size in 16 32 128 256 512
+	do
+		size2x="$(( size * 2 ))"
+		sips -z $size $size "$input" --out "$iconset_dir/icon_${size}x${size}.png"
+		sips -z $size2x $size2x "$input" --out "$iconset_dir/icon_${size2x}x${size2x}@2x.png"
+	done
+
+	iconutil -c icns "$iconset_dir" -o "$output"
+	rm -fr "$iconset_dir"
+}
+
+png2icns_version() {
+	_echo "$SCRIPT_NAME $VERSION"
+}
+
+_echo() {
+	echo "$@"
+}
+
+_error() {
+	_echo "$@" >&2
+}
+
+_exit() {
+	exit_code=$?
+	[ -n "$LOCAL_TMP_DIR" ] && [ -d "$LOCAL_TMP_DIR" ] && rm -rf "$LOCAL_TMP_DIR"
+	exit $exit_code
+}
+
+_fatal() {
+	exit_code="$1"
+	shift
+	_error "$@"
+	exit "$exit_code"
+}
+
+_invalid_cmd() {
+	_error "Invalid command: $cmd"
+	_echo
+	png2icns_help
+	exit $E_ARGS
+}
+
+_invalid_opt() {
+	_error "Invalid option: $opt"
+	_echo
+	png2icns_help
+	exit $E_ARGS
+}
+
+_mktmpdir() {
+	LOCAL_TMP_DIR="$( mktemp -dt "$SCRIPT_NAME" )"
+}
+
+png2icns_main "$@"

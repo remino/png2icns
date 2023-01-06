@@ -1,14 +1,11 @@
-template
+png2icns
 ========
 
-By Author <https://example.com>
+By Rémino Rem <https://remino.net>
 
-Short description of app or project.
+Convert a single PNG file into a macOS icon file.
 
-[Docs](https://example.com/)
-| [Demo](https://example.com/)
-| [Code](https://example.com/)
-| [Download](https://example.com/)
+[Source](https://github.com/remino/png2icns)
 
 - [About](#about)
 	- [Built With](#built-with)
@@ -19,7 +16,6 @@ Short description of app or project.
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
 
 
 
@@ -27,7 +23,7 @@ Short description of app or project.
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Longer description of product.
+Convert a single PNG file into an icon set of images in several sizes, then agglomerate that series of file into a single macOS icon file (.icns).
 
 [Back to top](#template)
 
@@ -54,19 +50,11 @@ Longer description of product.
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-    ```sh
-    git clone https://github.com/github_username/repo_name.git
-    ```
-3. Install NPM packages
-    ```sh
-    npm install
-    ```
-4. Enter your API in `config.js`
-    ```js
-    const API_KEY = 'ENTER YOUR API';
-    ```
+```
+git clone https://github.com/remino/png2icns
+cd png2icns
+./png2icns -h
+```
 
 [Back to top](#template)
 
@@ -74,9 +62,13 @@ Longer description of product.
 
 ## Usage
 
-Example usage of app or project.
+```
+# Example:
+png2icns icon.png icon.icns
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+# For all possible options:
+png2icns -h
+```
 
 [Back to top](#template)
 
@@ -113,14 +105,3 @@ Rémino Rem
 https://remino.net/
 
 [Back to top](#template)
-
-
-
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-[Back to top](#template)
-
